@@ -1,5 +1,9 @@
 import { unstable_noStore as noStore } from "next/cache"
-import { defaultSiteSections, resolveSiteContent } from "@/src/lib/content/default-sections"
+import {
+  defaultSectionVisibility,
+  defaultSiteSections,
+  resolveSiteContent,
+} from "@/src/lib/content/default-sections"
 import { sectionOrder, sectionRegistry } from "@/src/lib/content/section-registry"
 import { isSupabaseConfigured } from "@/src/lib/supabase/config"
 import { createClient } from "@/src/lib/supabase/server"
@@ -8,6 +12,7 @@ import type {
   JsonObject,
   JsonValue,
   ResolvedSiteContent,
+  SectionVisibility,
   SectionKey,
   SiteContentRow,
   SiteSections,
@@ -21,7 +26,7 @@ function mergeSections(rows: SiteContentRow[]): SiteSections {
   const merged = structuredClone(defaultSiteSections)
 
   rows.forEach((row) => {
-    if (!row.is_published || !isSectionKey(row.key)) {
+    if (!isSectionKey(row.key)) {
       return
     }
 
@@ -31,33 +36,66 @@ function mergeSections(rows: SiteContentRow[]): SiteSections {
   return merged
 }
 
-export async function getPublishedSections(): Promise<SiteSections> {
+function mergeVisibility(rows: SiteContentRow[]): SectionVisibility {
+  const merged = structuredClone(defaultSectionVisibility)
+
+  rows.forEach((row) => {
+    if (!isSectionKey(row.key)) {
+      return
+    }
+
+    merged[row.key] = row.is_published
+  })
+
+  return merged
+}
+
+async function getContentState(): Promise<{
+  sections: SiteSections
+  visibility: SectionVisibility
+}> {
   noStore()
 
   if (!isSupabaseConfigured()) {
-    return structuredClone(defaultSiteSections)
+    return {
+      sections: structuredClone(defaultSiteSections),
+      visibility: structuredClone(defaultSectionVisibility),
+    }
   }
 
   try {
     const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("site_content")
-      .select("*")
-      .eq("is_published", true)
+    const { data, error } = await supabase.from("site_content").select("*")
 
     if (error || !data) {
-      return structuredClone(defaultSiteSections)
+      return {
+        sections: structuredClone(defaultSiteSections),
+        visibility: structuredClone(defaultSectionVisibility),
+      }
     }
 
-    return mergeSections(data as SiteContentRow[])
+    const rows = data as SiteContentRow[]
+
+    return {
+      sections: mergeSections(rows),
+      visibility: mergeVisibility(rows),
+    }
   } catch {
-    return structuredClone(defaultSiteSections)
+    return {
+      sections: structuredClone(defaultSiteSections),
+      visibility: structuredClone(defaultSectionVisibility),
+    }
   }
 }
 
+export async function getPublishedSections(): Promise<SiteSections> {
+  const { sections } = await getContentState()
+  return sections
+}
+
 export async function getResolvedSiteContent(): Promise<ResolvedSiteContent> {
-  const sections = await getPublishedSections()
-  return resolveSiteContent(sections)
+  const { sections, visibility } = await getContentState()
+  return resolveSiteContent(sections, visibility)
 }
 
 export async function getSectionByKey<K extends SectionKey>(key: K): Promise<SiteSections[K]> {

@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card"
 import { useSiteContent } from "@/src/lib/content/content-provider"
 
 export function Sobre() {
-  const { about, alexSantos } = useSiteContent()
+  const { about, alexSantos, visibleSections } = useSiteContent()
   const valueIcons = [Target, Eye, Award]
 
   return (
@@ -32,35 +32,35 @@ export function Sobre() {
         </motion.div>
 
         {/* Leadership Highlight */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="max-w-4xl mx-auto mb-16"
-        >
-          <Card className="p-8 bg-primary/5 border-primary/20">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="relative h-28 w-28 overflow-hidden rounded-3xl border border-primary/20 bg-primary/10 flex-shrink-0">
-                <Image
-                  src={alexSantos.photo}
-                  alt={alexSantos.photoAlt}
-                  fill
-                  className="object-cover"
-                />
+        {visibleSections.alex_santos ? (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mx-auto mb-16 max-w-4xl"
+          >
+            <Card className="border-primary/20 bg-primary/5 p-8">
+              <div className="flex flex-col items-center gap-6 md:flex-row">
+                <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-3xl border border-primary/20 bg-primary/10">
+                  <Image
+                    src={alexSantos.photo}
+                    alt={alexSantos.photoAlt}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="text-center md:text-left">
+                  <h3 className="mb-2 text-xl font-bold text-foreground">{about.leadershipTitle}</h3>
+                  <p className="mb-2 text-sm font-medium text-primary">
+                    {alexSantos.name} · {alexSantos.role}
+                  </p>
+                  <p className="leading-relaxed text-muted-foreground">{about.leadershipText}</p>
+                </div>
               </div>
-              <div className="text-center md:text-left">
-                <h3 className="text-xl font-bold text-foreground mb-2">{about.leadershipTitle}</h3>
-                <p className="text-sm font-medium text-primary mb-2">
-                  {alexSantos.name} · {alexSantos.role}
-                </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  {about.leadershipText}
-                </p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
+            </Card>
+          </motion.div>
+        ) : null}
 
         {/* History Stats */}
         <motion.div
@@ -79,7 +79,8 @@ export function Sobre() {
         </motion.div>
 
         {/* Mission, Vision, Values */}
-        <div className="grid md:grid-cols-3 gap-6">
+        {visibleSections.club_identity ? (
+        <div className="grid gap-6 md:grid-cols-3">
           {about.values.map((item, index) => {
             const Icon = valueIcons[index]
 
@@ -102,6 +103,7 @@ export function Sobre() {
             )
           })}
         </div>
+        ) : null}
       </div>
     </section>
   )

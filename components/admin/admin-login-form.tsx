@@ -6,6 +6,7 @@ import { Loader2, LockKeyhole } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { getSupabaseConfigError } from "@/src/lib/supabase/config"
 import { createClient } from "@/src/lib/supabase/client"
 
 export function AdminLoginForm() {
@@ -20,19 +21,36 @@ export function AdminLoginForm() {
     setErrorMessage(null)
 
     startTransition(async () => {
-      const supabase = createClient()
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      try {
+        const configError = getSupabaseConfigError()
+        if (configError) {
+          setErrorMessage(configError)
+          return
+        }
 
-      if (error) {
-        setErrorMessage(error.message)
-        return
+        const supabase = createClient()
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (error) {
+          const readableMessage =
+            error.message === "Invalid path specified in request URL"
+              ? "Configuração do Supabase inválida no deploy. Use NEXT_PUBLIC_SUPABASE_URL sem /rest/v1 e faça novo deploy."
+              : error.message === "Invalid API key"
+                ? "Chave pública do Supabase inválida no deploy. Copie novamente a anon public key do mesmo projeto no Supabase, atualize NEXT_PUBLIC_SUPABASE_ANON_KEY na Vercel em Production e gere um novo deploy."
+                : error.message
+
+          setErrorMessage(readableMessage)
+          return
+        }
+
+        router.push("/admin")
+        router.refresh()
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : "Erro inesperado ao acessar o Supabase.")
       }
-
-      router.push("/admin")
-      router.refresh()
     })
   }
 

@@ -1,111 +1,169 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { Area, AreaChart, CartesianGrid, Line, XAxis, YAxis } from "recharts"
+import { TrendingUp } from "lucide-react"
 import { Card } from "@/components/ui/card"
-import { TrendingUp, ArrowUpRight } from "lucide-react"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { useSiteContent } from "@/src/lib/content/content-provider"
+
+function formatMillions(value: number) {
+  return `R$ ${value.toFixed(1).replace(".", ",")}M`
+}
 
 export function Projecoes() {
   const { projections } = useSiteContent()
-  const maxRevenue = Math.max(...projections.items.map((item) => item.revenue))
 
   return (
-    <section id="projecoes" className="py-24 bg-secondary">
+    <section id="projecoes" className="bg-secondary py-24">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="mb-16 text-center"
         >
-          <span className="text-primary text-sm font-medium tracking-wider uppercase mb-4 block">
+          <span className="mb-4 block text-sm font-medium uppercase tracking-wider text-primary">
             {projections.eyebrow}
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6 text-balance">
-            {projections.title}
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
-            {projections.description}
-          </p>
+          <h2 className="mb-6 text-balance text-3xl font-bold text-foreground md:text-5xl">{projections.title}</h2>
+          <p className="mx-auto max-w-3xl text-lg text-muted-foreground">{projections.description}</p>
         </motion.div>
 
-        {/* Key Metrics */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
+        <div className="mb-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {projections.metrics.map((metric, index) => (
             <motion.div
               key={metric.label}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
             >
-              <Card className="p-6 bg-card border-border text-center">
-                <p className="text-sm text-muted-foreground mb-2">{metric.label}</p>
-                <p className="text-2xl md:text-3xl font-bold text-foreground mb-1">{metric.value}</p>
-                <div className="flex items-center justify-center gap-1 text-primary">
-                  <ArrowUpRight className="w-4 h-4" />
-                  <span className="text-sm font-medium">{metric.change}</span>
-                </div>
+              <Card className="h-full min-w-0 border-border bg-card p-6">
+                <p className="text-sm text-muted-foreground">{metric.label}</p>
+                <p className="mt-3 break-words text-[clamp(1.75rem,3vw,2.75rem)] font-bold leading-tight text-foreground">
+                  {metric.value}
+                </p>
+                <p className="mt-2 text-sm font-medium text-primary">{metric.change}</p>
               </Card>
             </motion.div>
           ))}
         </div>
 
-        {/* Revenue Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mb-12"
+        >
+          <Card className="border-border bg-card p-8">
+            <div className="mb-8 flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">{projections.chartTitle}</h3>
+            </div>
+
+            <ChartContainer
+              className="h-[340px] w-full"
+              config={{
+                revenue: {
+                  label: "Receita",
+                  color: "hsl(var(--chart-1))",
+                },
+                growth: {
+                  label: "Crescimento",
+                  color: "hsl(var(--chart-2))",
+                },
+              }}
+            >
+              <AreaChart data={projections.items} margin={{ left: 8, right: 8, top: 12, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="projectionRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--chart-1))" stopOpacity={0.42} />
+                    <stop offset="100%" stopColor="hsl(var(--chart-1))" stopOpacity={0.04} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis dataKey="year" tickLine={false} axisLine={false} />
+                <YAxis
+                  yAxisId="revenue"
+                  tickLine={false}
+                  axisLine={false}
+                  width={72}
+                  tickFormatter={(value) => `R$ ${value}M`}
+                />
+                <YAxis
+                  yAxisId="growth"
+                  orientation="right"
+                  tickLine={false}
+                  axisLine={false}
+                  width={52}
+                  tickFormatter={(value) => `${value}%`}
+                />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value, name, item) => {
+                        if (name === "revenue") {
+                          return (
+                            <div className="flex min-w-[10rem] items-center justify-between gap-4">
+                              <span className="text-muted-foreground">Receita</span>
+                              <span className="font-semibold text-foreground">
+                                {formatMillions(Number(value))}
+                              </span>
+                            </div>
+                          )
+                        }
+
+                        return (
+                          <div className="flex min-w-[10rem] items-center justify-between gap-4">
+                            <span className="text-muted-foreground">Crescimento</span>
+                            <span className="font-semibold text-foreground">
+                              {item.payload.growth === null ? "Base" : `${value}%`}
+                            </span>
+                          </div>
+                        )
+                      }}
+                      labelFormatter={(label) => `Ano ${label}`}
+                    />
+                  }
+                />
+                <Area
+                  yAxisId="revenue"
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="hsl(var(--chart-1))"
+                  strokeWidth={3}
+                  fill="url(#projectionRevenue)"
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  yAxisId="growth"
+                  type="monotone"
+                  dataKey="growth"
+                  stroke="hsl(var(--chart-2))"
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  connectNulls={false}
+                />
+              </AreaChart>
+            </ChartContainer>
+          </Card>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-12"
         >
-          <Card className="p-8 bg-card border-border">
-            <div className="flex items-center gap-2 mb-8">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">{projections.chartTitle}</h3>
-            </div>
-
-            {/* Bar Chart */}
-            <div className="flex items-end justify-between gap-4 h-64">
-              {projections.items.map((item, index) => (
-                <div key={item.year} className="flex-1 flex flex-col items-center gap-2">
-                  <motion.div
-                    initial={{ height: 0 }}
-                    whileInView={{ height: `${(item.revenue / maxRevenue) * 100}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: index * 0.1 }}
-                    className="w-full bg-primary/80 rounded-t-lg relative min-h-[20px]"
-                  >
-                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-sm font-semibold text-primary whitespace-nowrap">
-                      R$ {item.revenue}M
-                    </span>
-                  </motion.div>
-                  <div className="text-center">
-                    <span className="text-sm font-medium text-foreground">{item.year}</span>
-                    {item.growth && (
-                      <span className="block text-xs text-primary">+{item.growth}%</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Assumptions */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          <Card className="p-6 bg-primary/5 border-primary/20">
-            <h4 className="text-lg font-semibold text-foreground mb-4">{projections.assumptionsTitle}</h4>
-            <div className="grid md:grid-cols-2 gap-3">
-              {projections.assumptions.map((assumption, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+          <Card className="border-primary/20 bg-primary/5 p-6">
+            <h4 className="mb-4 text-lg font-semibold text-foreground">{projections.assumptionsTitle}</h4>
+            <div className="grid gap-3 md:grid-cols-2">
+              {projections.assumptions.map((assumption, index) => (
+                <div key={`${assumption}-${index}`} className="flex items-start gap-3">
+                  <div className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
                   <span className="text-sm text-muted-foreground">{assumption}</span>
                 </div>
               ))}

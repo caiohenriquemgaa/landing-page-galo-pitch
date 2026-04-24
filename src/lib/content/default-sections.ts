@@ -1,6 +1,6 @@
 import { financialModel } from "@/src/content/financialModel"
 import { siteContent } from "@/src/content/siteContent"
-import type { ResolvedSiteContent, SectionKey, SiteSections } from "@/src/types/content"
+import type { ResolvedSiteContent, SectionKey, SectionVisibility, SiteSections } from "@/src/types/content"
 
 export const defaultSiteSections: SiteSections = {
   site_settings: {
@@ -60,7 +60,14 @@ export const defaultSiteSections: SiteSections = {
 
 export const defaultSectionKeys = Object.keys(defaultSiteSections) as SectionKey[]
 
-export function resolveSiteContent(sections: SiteSections): ResolvedSiteContent {
+export const defaultSectionVisibility = Object.fromEntries(
+  defaultSectionKeys.map((key) => [key, true]),
+) as SectionVisibility
+
+export function resolveSiteContent(
+  sections: SiteSections,
+  visibility: SectionVisibility = defaultSectionVisibility,
+): ResolvedSiteContent {
   const {
     site_settings,
     hero,
@@ -83,6 +90,7 @@ export function resolveSiteContent(sections: SiteSections): ResolvedSiteContent 
   } = sections
 
   return {
+    visibleSections: visibility,
     meta: site_settings.meta,
     header: site_settings.header,
     hero,

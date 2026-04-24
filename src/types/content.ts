@@ -384,6 +384,8 @@ export type SiteSections = {
   contact: ContactSection
 }
 
+export type SectionVisibility = Record<SectionKey, boolean>
+
 export type SiteContentRow = {
   id: string
   key: SectionKey
@@ -404,6 +406,7 @@ export type AdminSectionRecord<K extends SectionKey = SectionKey> = {
 }
 
 export type ResolvedSiteContent = {
+  visibleSections: SectionVisibility
   meta: SiteSettingsSection["meta"]
   header: SiteSettingsSection["header"]
   hero: HeroSection

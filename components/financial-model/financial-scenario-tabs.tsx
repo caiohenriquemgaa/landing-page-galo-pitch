@@ -60,22 +60,22 @@ export function FinancialScenarioTabs({
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="rounded-3xl border border-border/80 bg-secondary/40 p-6">
+                <div className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="min-w-0 rounded-3xl border border-border/80 bg-secondary/40 p-6">
                     <BarChart3 className="h-5 w-5 text-primary" />
                     <p className="mt-4 text-sm text-muted-foreground">Receita anual</p>
-                    <p className="mt-2 text-3xl font-bold text-foreground">
+                    <p className="mt-2 break-words text-[clamp(1.9rem,3vw,3rem)] font-bold leading-tight text-foreground">
                       {formatCurrency(scenario.annualRevenue)}
                     </p>
                   </div>
-                  <div className="rounded-3xl border border-border/80 bg-secondary/40 p-6">
+                  <div className="min-w-0 rounded-3xl border border-border/80 bg-secondary/40 p-6">
                     <TrendingUp className="h-5 w-5 text-primary" />
                     <p className="mt-4 text-sm text-muted-foreground">Valorização do projeto</p>
-                    <p className="mt-2 text-3xl font-bold text-foreground">
+                    <p className="mt-2 break-words text-[clamp(1.9rem,3vw,3rem)] font-bold leading-tight text-foreground">
                       {formatCurrency(scenario.projectValuation)}
                     </p>
                   </div>
-                  <div className="rounded-3xl border border-border/80 bg-secondary/40 p-6 md:col-span-3">
+                  <div className="rounded-3xl border border-border/80 bg-secondary/40 p-6 md:col-span-2 xl:col-span-3">
                     <Trophy className="h-5 w-5 text-primary" />
                     <p className="mt-4 text-sm text-muted-foreground">Potencial de expansão esportiva</p>
                     <p className="mt-2 text-base leading-7 text-foreground/90">{scenario.sportsExpansion}</p>

@@ -347,8 +347,10 @@ export function SectionEditor({ section, onSaved, canSave }: SectionEditorProps)
             <div className="flex items-center gap-3">
               <Switch checked={isPublished} onCheckedChange={setIsPublished} />
               <div>
-                <p className="text-sm font-medium text-foreground">Publicado</p>
-                <p className="text-xs text-muted-foreground">Controla se a seção aparece na landing pública.</p>
+                <p className="text-sm font-medium text-foreground">{isPublished ? "Seção visível" : "Seção oculta"}</p>
+                <p className="text-xs text-muted-foreground">
+                  Controla se a seção aparece na landing pública sem apagar o conteúdo salvo.
+                </p>
               </div>
             </div>
             <Button onClick={handleSave} disabled={!canSave || isPending}>

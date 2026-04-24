@@ -30,7 +30,19 @@ export function AdminSidebar({ sections, selectedKey, onSelect }: AdminSidebarPr
                   : "border-transparent bg-transparent text-muted-foreground hover:border-border hover:bg-secondary/60",
               )}
             >
-              <p className="font-semibold">{section.label}</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-semibold">{section.label}</p>
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em]",
+                    section.isPublished
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {section.isPublished ? "Visível" : "Oculta"}
+                </span>
+              </div>
               <p className="mt-1 text-xs leading-5">{section.description}</p>
             </button>
           ))}
