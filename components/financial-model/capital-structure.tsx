@@ -44,17 +44,17 @@ export function CapitalStructure({
         <h3 className="mt-3 text-2xl font-bold text-foreground">{capitalStructure.title}</h3>
         <p className="mt-4 text-sm leading-7 text-muted-foreground">{capitalStructure.description}</p>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-8 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {highlights.map((item) => {
             const Icon = item.icon
 
             return (
               <div key={item.label} className="min-w-0 rounded-2xl border border-border/80 bg-card/80 p-5">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-sm text-muted-foreground">{item.label}</p>
-                  <Icon className="h-5 w-5 text-primary" />
+                  <p className="min-w-0 pr-2 text-sm text-muted-foreground">{item.label}</p>
+                  <Icon className="h-5 w-5 shrink-0 text-primary" />
                 </div>
-                <p className="mt-4 break-words text-[clamp(1.75rem,3vw,2.5rem)] font-bold leading-tight text-foreground">
+                <p className="mt-4 min-w-0 text-[clamp(1.55rem,2vw,2.3rem)] font-bold leading-[1.08] tracking-tight text-foreground [word-spacing:-0.08em]">
                   {item.value}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
@@ -67,7 +67,7 @@ export function CapitalStructure({
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Espaço imediato para crescimento</p>
-              <p className="mt-2 break-words text-[clamp(1.9rem,3vw,3rem)] font-bold leading-tight text-primary">
+              <p className="mt-2 min-w-0 text-[clamp(1.7rem,2.4vw,2.75rem)] font-bold leading-[1.08] tracking-tight text-primary [word-spacing:-0.08em]">
                 {formatCurrency(growthRunway)}
               </p>
             </div>

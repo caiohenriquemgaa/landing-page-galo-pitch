@@ -36,7 +36,7 @@ export function FinancialKpiCards({ kpis, formatCurrency }: FinancialKpiCardsPro
   ] as const
 
   return (
-    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-4">
       {items.map((item) => {
         const Icon = item.icon
 
@@ -47,14 +47,14 @@ export function FinancialKpiCards({ kpis, formatCurrency }: FinancialKpiCardsPro
           >
             <div className="flex h-full flex-col justify-between gap-5 p-6">
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">{item.label}</p>
-                  <p className="mt-3 text-2xl font-bold text-foreground md:text-3xl">{item.value}</p>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10">
+                <p className="min-w-0 pr-2 text-sm text-muted-foreground">{item.label}</p>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10">
                   <Icon className="h-5 w-5 text-primary" />
                 </div>
               </div>
+              <p className="min-w-0 text-[clamp(1.85rem,2.2vw,2.65rem)] font-bold leading-[1.05] tracking-tight text-foreground [word-spacing:-0.08em]">
+                {item.value}
+              </p>
               <p className="text-sm leading-6 text-muted-foreground">{item.description}</p>
             </div>
           </Card>
